@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon FC Kaizen Overlord - Report Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+JP:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --accent-color: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --input-bg: rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Background Effects */
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: pulse 10s infinite alternate;
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: #6366f1;
+            top: -100px;
+            right: -100px;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: #a855f7;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 2s;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1) translate(0, 0);
+            }
+
+            to {
+                transform: scale(1.1) translate(20px, 20px);
+            }
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            padding: 3rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+        }
+
+        .badge {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+            color: #e879f9;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Components */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .unknown-check {
+            font-size: 0.75rem;
+            color: #e879f9;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .unknown-check input {
+            width: auto;
+            margin: 0;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 600px) {
+
+            .form-grid,
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Output Section */
+        #output-section {
+            margin-top: 3rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .report-content {
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            border-left: 4px solid #a855f7;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-card {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+        }
+
+        .score-value .number {
+            font-size: 3rem;
+            display: block;
+        }
+
+        .score-details ul {
+            list-style: none;
+        }
+
+        .score-details li {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            margin-bottom: 0.3rem;
+        }
+
+        .check {
+            margin-right: 0.5rem;
+        }
+
+        /* Utils */
+        .hidden {
+            display: none;
+        }
+
+        .advanced-toggle {
+            margin-top: 1rem;
+        }
+
+        .advanced-toggle button {
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loader-ring {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Warning Panel for Missing Info */
+        #missing-info-section {
+            margin-top: 1.5rem;
+        }
+
+        .warning-panel {
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.05);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .warning-title {
+            color: #f59e0b;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .warning-list {
+            list-style: none;
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+
+        .warning-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .warning-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            font-size: 0.7rem;
+            top: 0.3rem;
+        }
+
+        .uncertain-field {
+            border-color: #a855f7 !important;
+            color: #a855f7 !important;
+            background: rgba(168, 85, 247, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body class="dark-theme">
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <span class="gradient-text">Kaizen Overlord</span>
+            <span class="badge">Supreme Edition</span>
+        </div>
+        <div class="tagline">L10 Global Director Standard</div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="input-section glass-panel">
+                <div class="section-header">
+                    <h2>カイゼン内容の入力</h2>
+                    <p>断片的な情報から、最高評価の報告書を自動構成します。</p>
+                </div>
+
+                <form id="kaizen-form">
+                    <div class="form-group">
+                        <label for="basic-info">基本情報 / タイトル案</label>
+                        <input type="text" id="target-subject" placeholder="例：伸縮リール、パレット積み込み等" required>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="problem-fragment">何が問題か？</label>
+                            <textarea id="problem-fragment" placeholder="例：ケーブルが絡まって3秒停滞する、腰が痛い等" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="solution-fragment">どう解決したか？</label>
+                            <textarea id="solution-fragment" placeholder="例：リールをつけた、真空リフトを入れた等" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>Before (秒/回)</label>
+                                <label class="unknown-check"><input type="checkbox" id="unknown-before"> 不明</label>
+                            </div>
+                            <input type="number" id="before-val" step="0.1" value="5.0">
+                        </div>
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>After (秒/回)</label>
+                                <label class="unknown-check"><input type="checkbox" id="unknown-after"> 不明</label>
+                            </div>
+                            <input type="number" id="after-val" step="0.1" value="2.0">
+                        </div>
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>頻度 (回/日)</label>
+                                <label class="unknown-check"><input type="checkbox" id="unknown-frequency"> 不明</label>
+                            </div>
+                            <input type="number" id="frequency" value="300">
+                        </div>
+                    </div>
+
+                    <div class="advanced-toggle">
+                        <button type="button" id="toggle-advanced">詳細設定を表示 (DEI, Sustainability, Scaling)</button>
+                    </div>
+
+                    <div id="advanced-fields" class="hidden">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="denominator">水平展開の母数 (台/箇所)</label>
+                                <input type="number" id="denominator" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="maintenance-cost">維持管理コスト (円/年)</label>
+                                <input type="number" id="maintenance-cost" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">報告書を自動生成する</span>
+                        <div class="loader-ring hidden"></div>
+                    </button>
+                </form>
+            </section>
+
+            <section id="output-section" class="hidden">
+                <div class="output-header">
+                    <h3>生成された報告書 (Precision Draft)</h3>
+                    <div class="actions">
+                        <button id="copy-btn" class="secondary-btn">クリップボードにコピー</button>
+                    </div>
+                </div>
+                <div id="report-output" class="report-content glass-panel">
+                    <!-- Generated report will appear here -->
+                </div>
+
+                <div id="missing-info-section" class="hidden">
+                    <div class="warning-panel glass-panel">
+                        <h4 class="warning-title">⚠️ データの誠実性に関する警告</h4>
+                        <p>正確なROI算出のため、以下の情報を現場で確認する必要があります：</p>
+                        <ul id="missing-info-list" class="warning-list">
+                            <!-- Missing info items will appear here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="score-card glass-panel">
+                    <div class="score-value">
+                        <span class="label">Estimated Score</span>
+                        <span class="number gradient-text">95+</span>
+                    </div>
+                    <div class="score-details">
+                        <ul>
+                            <li><span class="check">✓</span> Net ROI Calculation Applied</li>
+                            <li><span class="check">✓</span> Nominalization (Hardened)</li>
+                            <li><span class="check">✓</span> Psychological WB Integration</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('kaizen-form');
+            const advancedToggle = document.getElementById('toggle-advanced');
+            const advancedFields = document.getElementById('advanced-fields');
+            const outputSection = document.getElementById('output-section');
+            const reportOutput = document.getElementById('report-output');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            advancedToggle.addEventListener('click', () => {
+                advancedFields.classList.toggle('hidden');
+                advancedToggle.textContent = advancedFields.classList.contains('hidden')
+                    ? '詳細設定を表示 (DEI, Sustainability, Scaling)'
+                    : '詳細設定を隠す';
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                submitBtn.disabled = true;
+                submitBtn.querySelector('.btn-text').textContent = '生成中...';
+                submitBtn.querySelector('.loader-ring').classList.remove('hidden');
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                try {
+                    const data = {
+                        subject: document.getElementById('target-subject').value,
+                        problem: document.getElementById('problem-fragment').value,
+                        solution: document.getElementById('solution-fragment').value,
+                        before: document.getElementById('unknown-before').checked ? null : parseFloat(document.getElementById('before-val').value),
+                        after: document.getElementById('unknown-after').checked ? null : parseFloat(document.getElementById('after-val').value),
+                        frequency: document.getElementById('unknown-frequency').checked ? null : parseInt(document.getElementById('frequency').value),
+                        denominator: parseInt(document.getElementById('denominator').value),
+                        maintenance: parseInt(document.getElementById('maintenance-cost').value),
+                        wk: getWeekNumber(new Date())
+                    };
+
+                    const result = generateOverlordReport(data);
+                    reportOutput.textContent = result.report;
+
+                    const missingSection = document.getElementById('missing-info-section');
+                    const missingList = document.getElementById('missing-info-list');
+
+                    if (result.missingItems.length > 0) {
+                        missingList.innerHTML = result.missingItems.map(item => `<li>${item}</li>`).join('');
+                        missingSection.classList.remove('hidden');
+                    } else {
+                        missingSection.classList.add('hidden');
+                    }
+
+                    outputSection.classList.remove('hidden');
+                    outputSection.scrollIntoView({ behavior: 'smooth' });
+
+                } catch (err) {
+                    console.error(err);
+                    alert('生成中にエラーが発生しました。入力内容を確認してください。');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.querySelector('.btn-text').textContent = '報告書を自動生成する';
+                    submitBtn.querySelector('.loader-ring').classList.add('hidden');
+                }
+            });
+
+            function getWeekNumber(d) {
+                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+                var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            }
+
+            function generateOverlordReport(d) {
+                const missingItems = [];
+                const placeholder = '[数値入力待ち]';
+                const overhead = 0.5;
+
+                const b = d.before !== null ? d.before : null;
+                const a = d.after !== null ? d.after : null;
+                const f = d.frequency !== null ? d.frequency : null;
+
+                let netReduction = placeholder;
+                let a_savings = placeholder;
+                let c_savings = placeholder;
+                let e_savings = placeholder;
+
+                if (b !== null && a !== null) {
+                    const net = Math.max(0.1, b - a - overhead);
+                    netReduction = net.toFixed(1);
+                    if (f !== null) {
+                        const total_a = Math.round((net / 3600) * 1500 * f * 365);
+                        a_savings = total_a.toLocaleString() + '円';
+                        const weeksLeft = 53 - d.wk;
+                        const total_c = Math.round((total_a / 52) * weeksLeft);
+                        c_savings = total_c.toLocaleString() + '円';
+                        e_savings = (total_c - d.maintenance).toLocaleString() + '円';
+                    }
+                }
+
+                if (b === null) missingItems.push('改善前の正確な作業サイクルタイム（秒/回）の計測');
+                if (a === null) missingItems.push('改善後の期待される作業サイクルタイム（秒/回）の定義');
+                if (f === null) missingItems.push('対象工程の1日あたりの平均発生頻度（回/日）の調査');
+
+                const hardenedProblem = nominalize(d.problem);
+                const hardenedSolution = nominalize(d.solution);
+
+                const report = `１，タイトル：${d.subject}の最適化による作業サイクルタイムの短縮
+
+２，現状：
+${d.subject}に関連する工程において、${d.problem}に起因する非効率が発生している状態。
+
+３．問題：
+${hardenedProblem}。1回あたり${b !== null ? b : placeholder}秒の動作停滞を観測。
+（${b !== null ? b : placeholder}秒/回 ｘ ${f !== null ? f : placeholder}回/日 ＝ ${b !== null && f !== null ? Math.round(b * f / 60) : placeholder}分/日の工数損失）
+また、作業者の集中力阻害に伴う品質エラーおよび定着率低下のリスク内在。
+
+４、問題の真因：
+なぜ？：${d.problem}を許容する物理的構成の存在。
+なぜ？：${d.subject}導入時の安全・効率基準における「動的最適化メカニズム」の欠落。
+真因：4MのMethod（管理方法）における、特定条件下での稼働ロスを防止する標準プロセスの不全。
+
+５，ワーキングバックワーズ：
+未来のワーカーの声：
+「${d.subject}の改善により、以前感じていた${d.problem}への心理的不安が消失しました。作業リズムの維持が容易となり、人的資本の損耗を防ぎつつ、プロフェッショナルとして業務に専念できる環境を高く評価しています。」
+
+６，実施した対策：
+${hardenedSolution}の実施。
+（対策実施日：WK${d.wk}、実施者：Kaizen App User）
+Before：${d.problem}に伴う動作停滞。
+After：対策実施による動作の円滑化および物理的干渉の排除。
+【Fail-safe】：予期せぬ停止時も、手動介入が即座に可能な二次安全手順の確保。
+
+７、効果測定：
+・総削減時間：${b !== null ? b : placeholder}秒 ➡ ${a !== null ? a : placeholder}秒
+・オーバーヘッド（付随動作）：+${overhead}秒
+・純減（Net Reduction）：${netReduction}秒/個（IE算定値）
+・保守コスト：年間 ${d.maintenance.toLocaleString()}円（電力・点検工数含む）
+${netReduction}秒/個 ÷ 3600 ｘ 1500円 ｘ ${f !== null ? f : placeholder}回 ｘ 365日 ＝ ${a_savings}
+（補足：当FC内の全${d.denominator}箇所へ水平展開することで、年間約${a_savings !== placeholder ? Math.round(parseInt(a_savings.replace(/,/g, '')) * d.denominator / 10000).toLocaleString() : placeholder}万円の削減寄与が可能。）
+
+８，1年間で削減できる金額 (A)：${a_savings}
+９，カイゼンの効果開始週(B)：WK${d.wk}
+10, 本年削減金額 (C)：${c_savings}
+１１，カイゼン費用 (D)：${d.maintenance.toLocaleString()}円
+１２，本年度実削減金額 (E)：${e_savings}`;
+
+                return { report, missingItems };
+            }
+
+            function nominalize(str) {
+                let processed = str.replace(/です|ます|だ|である/g, '');
+                if (!processed.endsWith('。')) processed += '。';
+                return processed + 'それに伴う作業遅延、および安全上の懸念の解決。';
+            }
+
+            document.getElementById('copy-btn').addEventListener('click', () => {
+                const text = reportOutput.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('クリップボードにコピーしました。');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
