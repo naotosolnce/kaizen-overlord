@@ -3,88 +3,66 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Report Generator - Amazon FC Official Standard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kaizen Supreme - Professional Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d0e12;
-            --panel-bg: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            --accent-color: #10b981;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --input-bg: rgba(0, 0, 0, 0.2);
-            --warning-color: #f59e0b;
+            --bg-deep: #05060f;
+            --card-glass: rgba(255, 255, 255, 0.03);
+            --card-overlay: rgba(255, 255, 255, 0.05);
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --primary: #6366f1;
+            --primary-glow: #818cf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
             min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .background-blobs {
+        /* Abstract Premium Background */
+        .bg-mesh {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             z-index: -1;
-            overflow: hidden;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.1;
-            animation: pulse 15s infinite alternate;
-        }
-
-        .blob-1 {
-            width: 600px;
-            height: 600px;
-            background: #2563eb;
-            top: -100px;
-            right: -100px;
-        }
-
-        .blob-2 {
-            width: 500px;
-            height: 500px;
-            background: #7c3aed;
-            bottom: -100px;
-            left: -100px;
-        }
-
-        @keyframes pulse {
-            from {
-                transform: scale(1);
-            }
-
-            to {
-                transform: scale(1.1) translate(20px, 20px);
-            }
+            background:
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
         }
 
         .container {
-            max-width: 900px;
+            width: 100%;
+            max-width: 500px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -92,190 +70,194 @@
             text-align: center;
         }
 
-        .gradient-text {
-            background: var(--primary-gradient);
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            font-size: 2.2rem;
-            letter-spacing: -1px;
         }
 
-        .tagline {
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+        /* Stepper UI */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
         }
 
-        .glass-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--card-overlay);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: scale(1.5);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
         }
 
-        .form-group {
-            margin-bottom: 1.2rem;
+        .glass-card.hidden {
+            display: none;
+        }
+
+        .field-group {
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input,
-        textarea {
+        textarea,
+        select {
             width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.8rem 1rem;
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 1rem;
+            color: var(--text-main);
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
 
         input:focus,
         textarea:focus {
             outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.2rem;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.2rem;
-            margin-top: 0.5rem;
-        }
-
-        .submit-btn {
+        /* Button Supreme */
+        .btn-supreme {
             width: 100%;
-            background: var(--primary-gradient);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 1.1rem;
-            border-radius: 16px;
-            font-size: 1.05rem;
+            padding: 1.2rem;
+            border-radius: 18px;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 1.5rem;
-            transition: transform 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        .btn-supreme:active {
+            transform: scale(0.98);
         }
 
-        #out-sec {
-            margin-top: 3rem;
-            animation: fadeIn 0.4s;
-            padding-bottom: 5rem;
+        .btn-supreme:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .report-section-header {
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            margin-top: 1rem;
+        }
+
+        /* Output View */
+        .report-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
             margin-bottom: 1rem;
         }
 
-        .report-content {
-            white-space: pre-wrap;
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: #f1f5f9;
-            border-left: 4px solid #2563eb;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 1.5rem;
-            border-radius: 0 12px 12px 12px;
-            font-family: inherit;
+        .score-display {
+            text-align: right;
         }
 
-        .audit-panel {
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            background: rgba(245, 158, 11, 0.05);
-            padding: 1.2rem;
-            border-radius: 16px;
-            margin-top: 1.5rem;
-        }
-
-        .audit-title {
-            color: var(--warning-color);
-            margin-bottom: 0.6rem;
-            font-size: 0.95rem;
-            font-weight: 800;
-        }
-
-        .audit-list {
-            list-style: none;
-            font-size: 0.85rem;
-            color: #fbbf24;
-        }
-
-        .score-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-
-        .score-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .score-value {
+        .score-large {
             font-size: 3rem;
             font-weight: 800;
-            display: block;
             line-height: 1;
+            color: var(--primary-glow);
         }
 
-        .secondary-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .report-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            border-left: 2px solid var(--primary);
+            margin-bottom: 2rem;
         }
 
-        .hidden {
-            display: none;
+        .audit-item {
+            display: flex;
+            gap: 12px;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.05);
+            border-radius: 14px;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .audit-cat {
+            font-weight: 800;
+            color: var(--warning);
+            min-width: 60px;
+        }
+
+        /* iPhone 7 Specific Fixes */
+        @media (max-width: 375px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .glass-card {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(15px);
+                transform: translateY(10px);
             }
 
             to {
@@ -284,143 +266,157 @@
             }
         }
 
-        .loader-ring {
-            width: 22px;
-            height: 22px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin: 2rem 0 1rem;
-            color: #60a5fa;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
+    <div class="bg-mesh"></div>
 
-    <header class="container">
-        <h1 class="gradient-text">Kaizen Report Generator</h1>
-        <p class="tagline">Amazon FC Official Training Standard</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Kaizen Supreme</h1>
+            <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 4px;">Elite Performance Report</p>
+        </header>
 
-    <main class="container">
+        <div class="stepper" id="stepper">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
 
-        <section class="glass-panel">
-            <h2 class="section-title" style="margin-top: 0;">基本情報の入力</h2>
-            <form id="kaizen-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>対策（やったこと：〇〇）</label>
-                        <input type="text" id="measure" placeholder="例：レイアウト変更" required>
+        <main>
+            <!-- STEP 1: Framing -->
+            <div class="glass-card fade-in" id="step-1">
+                <p style="margin-bottom: 1.5rem; font-weight: 700;">Step 1: 戦略的タイトルの作成</p>
+                <div class="field-group">
+                    <label>対策 (何をしたか)</label>
+                    <input type="text" id="measure" placeholder="例：シリコンフラップの設置" required>
+                </div>
+                <div class="field-group">
+                    <label>変化対象 (何が変わるか)</label>
+                    <input type="text" id="target" placeholder="例：テープの張り付き位置" required>
+                </div>
+                <div class="field-group">
+                    <label>結果 (どうなったか)</label>
+                    <input type="text" id="result" placeholder="例：適正化" required>
+                </div>
+                <div class="field-group">
+                    <label>開始週 (WK)</label>
+                    <input type="number" id="wk" value="10">
+                </div>
+                <button class="btn-supreme" onclick="nextStep(2)">次へ進む</button>
+            </div>
+
+            <!-- STEP 2: Analysis -->
+            <div class="glass-card hidden fade-in" id="step-2">
+                <p style="margin-bottom: 1.5rem; font-weight: 700;">Step 2: 現状と対策の深掘り</p>
+                <div class="field-group">
+                    <label>現状（問題の描写）</label>
+                    <textarea id="prob" rows="4" placeholder="誰が見ても困っている状況が伝わるように..." required></textarea>
+                </div>
+                <div class="field-group">
+                    <label>実施内容（具体的な5W1H）</label>
+                    <textarea id="sol" rows="4" placeholder="いつ、どこに、何を、どう設置したか..." required></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-supreme btn-secondary" onclick="nextStep(1)">戻る</button>
+                    <button class="btn-supreme" onclick="nextStep(3)">次へ進む</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Data -->
+            <div class="glass-card hidden fade-in" id="step-3">
+                <p style="margin-bottom: 1.5rem; font-weight: 700;">Step 3: 財務データとROI</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="field-group">
+                        <label>改善前 (秒/分)</label>
+                        <input type="number" id="b-val" value="10" step="0.1">
                     </div>
-                    <div class="form-group">
-                        <label>変化対象（□□）</label>
-                        <input type="text" id="target" placeholder="例：作業動線" required>
-                    </div>
-                    <div class="form-group">
-                        <label>結果（△△）</label>
-                        <input type="text" id="result" placeholder="例：短縮" required>
-                    </div>
-                    <div class="form-group">
-                        <label>WK（効果開始週）</label>
-                        <input type="number" id="wk" value="10">
+                    <div class="field-group">
+                        <label>改善後 (秒/分)</label>
+                        <input type="number" id="a-val" value="2" step="0.1">
                     </div>
                 </div>
-
-                <h2 class="section-title">内容の入力</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>現状（今起きている状況）</label>
-                        <textarea id="prob" placeholder="例：台車が遠くにあり、取りに行くのに時間がかかる" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>対策（具体的な実施内容：5W1H）</label>
-                        <textarea id="sol" placeholder="例：台車の置き場を作業机のすぐ後ろに変更した" required></textarea>
-                    </div>
+                <div class="field-group">
+                    <label>時間単位</label>
+                    <select id="unit-type">
+                        <option value="sec">秒 (Seconds)</option>
+                        <option value="min">分 (Minutes)</option>
+                    </select>
                 </div>
-
-                <h2 class="section-title">数値の入力（効果測定）</h2>
-                <div class="metrics-grid">
-                    <div class="form-group">
-                        <label>改善前 (秒 or 分)</label>
-                        <input type="number" id="b-val" step="0.1" value="300" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="field-group">
+                        <label>頻度 (回/日)</label>
+                        <input type="number" id="f-val" value="500">
                     </div>
-                    <div class="form-group">
-                        <label>改善後 (秒 or 分)</label>
-                        <input type="number" id="a-val" step="0.1" value="180" required>
-                    </div>
-                    <div class="form-group">
-                        <label>単位</label>
-                        <select id="unit-type"
-                            style="width:100%; background:var(--input-bg); color:white; border:1px solid var(--border-color); padding:0.8rem; border-radius:12px;">
-                            <option value="min">分</option>
-                            <option value="sec">秒</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>1日の発生頻度（回/日）</label>
-                        <input type="number" id="f-val" value="3" required>
-                    </div>
-                    <div class="form-group">
-                        <label>発生費用 (円)</label>
+                    <div class="field-group">
+                        <label>費用 (円)</label>
                         <input type="number" id="cost" value="0">
                     </div>
                 </div>
-
-                <button type="submit" class="submit-btn" id="sub-btn">
-                    <span class="btn-text">報告書（公式フォーマット）を作成</span>
-                    <div class="loader-ring hidden"></div>
-                </button>
-            </form>
-        </section>
-
-        <section id="out-sec" class="hidden">
-            <div class="report-section-header">
-                <h3>Draft Score <span id="l-score" class="gradient-text">--</span></h3>
-                <button id="cp-btn" class="secondary-btn">コピー</button>
-            </div>
-            <div id="rep-out" class="report-content"></div>
-            <div id="msg-sec" class="hidden">
-                <div class="audit-panel">
-                    <div class="audit-title">💡 公式ルールに基づく補足</div>
-                    <ul id="msg-list" class="audit-list"></ul>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-supreme btn-secondary" onclick="nextStep(2)">戻る</button>
+                    <button class="btn-supreme" style="background: var(--success);" id="finish-btn"
+                        onclick="finish()">完成させる</button>
                 </div>
             </div>
-            <div class="score-card">
-                <div class="score-label">Reliability Score</div>
-                <div class="score-value"><span id="big-score" class="gradient-text">--</span></div>
+
+            <!-- OUTPUT -->
+            <div id="output-view" class="hidden fade-in">
+                <div class="report-header">
+                    <div>
+                        <p style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Final Report
+                        </p>
+                        <h2 style="font-size: 1.2rem;">Generated Draft</h2>
+                    </div>
+                    <div class="score-display">
+                        <p style="font-size: 0.6rem; color: var(--text-dim);">DIVE DEEP SCORE</p>
+                        <div class="score-large" id="l-score">--</div>
+                    </div>
+                </div>
+
+                <div id="rep-out" class="report-box"></div>
+
+                <div id="audit-sec" style="margin-bottom: 2rem;">
+                    <p
+                        style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); margin-bottom: 1rem; text-transform: uppercase;">
+                        Detailed Audit Insights</p>
+                    <div id="audit-list"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-supreme btn-secondary" style="flex: 1;" onclick="restart()">最初から</button>
+                    <button class="btn-supreme" style="flex: 2;" onclick="copyReport()">レポートをコピー</button>
+                </div>
             </div>
-        </section>
-    </main>
+        </main>
+    </div>
 
     <script>
-        document.getElementById('kaizen-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('sub-btn');
-            btn.disabled = true;
-            btn.querySelector('.loader-ring').classList.remove('hidden');
-            await new Promise(r => setTimeout(r, 600));
+        let currentStep = 1;
+        const totalSteps = 3;
 
+        function nextStep(s) {
+            document.querySelectorAll('.glass-card').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`step-${s}`).classList.remove('hidden');
+
+            const dots = document.querySelectorAll('.step-dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i < s));
+            currentStep = s;
+            window.scrollTo(0, 0);
+        }
+
+        function restart() {
+            document.getElementById('output-view').classList.add('hidden');
+            document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+            document.getElementById('stepper').classList.remove('hidden');
+            nextStep(1);
+        }
+
+        function finish() {
             const d = {
                 measure: document.getElementById('measure').value,
                 target: document.getElementById('target').value,
@@ -436,133 +432,89 @@
                 rate: 1500
             };
 
-            const res = generate(d);
+            const res = generateReport(d);
+
             document.getElementById('rep-out').textContent = res.txt;
-            document.getElementById('big-score').textContent = res.s;
             document.getElementById('l-score').textContent = res.s;
+            document.getElementById('audit-list').innerHTML = res.audit.map(a => `
+                <div class="audit-item">
+                    <div class="audit-cat">${a.cat}</div>
+                    <div>
+                        <span style="font-weight: 800; color: ${a.p < 0 ? 'var(--error)' : 'var(--success)'};">${a.p > 0 ? '+' : ''}${a.p}pts</span>
+                        <p style="margin-top:2px; opacity: 0.8;">${a.msg}</p>
+                    </div>
+                </div>
+            `).join('') || '<p style="font-size:0.8rem; opacity:0.5;">✅ すべての監査基準を満たしています。</p>';
 
-            const ban = document.getElementById('integrity-banner');
-            if (res.isMismatch) {
-                if (!ban) {
-                    const newBan = document.createElement('div');
-                    newBan.id = 'integrity-banner';
-                    newBan.className = 'warning-banner';
-                    newBan.textContent = '⚠️ データの整合性に疑義があります：タイトルと対策内容が一致していません。';
-                    document.querySelector('main').prepend(newBan);
-                } else {
-                    ban.classList.remove('hidden');
-                }
-            } else if (ban) {
-                ban.classList.add('hidden');
-            }
+            document.getElementById('stepper').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+            document.getElementById('output-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
 
-            const mSec = document.getElementById('msg-sec');
-            if (res.audit.length > 0) {
-                document.getElementById('msg-list').innerHTML = res.audit.map(a => `
-                    <li style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
-                        <strong style="color:#f59e0b; display:block; font-size:0.9rem;">【${a.cat}】 点数：${a.p > 0 ? '+' : ''}${a.p}</strong>
-                        <span style="display:block; margin-top:0.2rem;">${a.msg}</span>
-                    </li>
-                `).join('');
-                mSec.classList.remove('hidden');
-            } else {
-                document.getElementById('msg-list').innerHTML = '<li>✅ 全ての論理監査項目をクリアしています。</li>';
-                mSec.classList.remove('hidden');
-            }
-
-            document.getElementById('out-sec').classList.remove('hidden');
-            document.getElementById('out-sec').scrollIntoView({ behavior: 'smooth' });
-            btn.disabled = false;
-            btn.querySelector('.loader-ring').classList.add('hidden');
-        };
-
-        function generate(d) {
+        function generateReport(d) {
             const audit = [];
             let s = 95;
-            let isMismatch = false;
 
-            // 1. カイゼン前・カイゼン後の削減時間を算出
+            // ROI Logic (Official FC 4-Step)
             const diff = d.b - d.a;
-            const diffUnit = d.unit === 'min' ? '分' : '秒';
-
-            // 2. 秒・分で計測したものを時間に換算
-            const hoursPerTime = d.unit === 'min' ? diff / 60 : diff / 3600;
-
-            // 3. 削減できた時間×人件費（一律 1,500円）
+            const diffUnit = d.unit === 'sec' ? '秒' : '分';
+            const hoursPerTime = d.unit === 'sec' ? diff / 3600 : diff / 60;
             const yenPerTime = hoursPerTime * d.rate;
+            const yenPerYear = Math.round(yenPerTime * d.f * 365);
 
-            // 4. 1日x回、1年間に換算
-            const yenPerDay = yenPerTime * d.f;
-            const yenPerYear = Math.round(yenPerDay * 365);
+            // Audit Logic (Ron-logic)
+            const subK = ['視認', '見える', '表示', 'カラー', 'ライト', '目印'];
+            const solK = ['剥がす', 'くっつく', 'フラップ', '返し', '物理', '清掃'];
+            const hasSubV = subK.some(k => d.measure.includes(k) || d.target.includes(k));
+            const hasSolP = solK.some(k => d.sol.includes(k));
 
-            // --- Audit Logic ---
-            const subV = ['視認', '見える', '表示', 'カラー', 'ライト', '目印'];
-            const solP = ['剥がす', 'くっつく', 'キャスター', '清掃', 'フラップ', '返し', '取り付け', '固定'];
-
-            const hasSubV = subV.some(k => d.measure.includes(k) || d.target.includes(k));
-            const hasSolP = solP.some(k => d.sol.includes(k));
-            const hasSolV = subV.some(k => d.sol.includes(k));
-
-            if (hasSubV && hasSolP && !hasSolV) {
-                isMismatch = true;
-                audit.push({ cat: "整合性", p: -40, msg: "タイトルは『視認性』ですが、対策が『物理的な改善』です。見やすくすることで張り付きが直る論理的説明が不足しています。" });
+            if (hasSubV && hasSolP) {
+                audit.push({ cat: "整合性", p: -40, msg: "タイトルは『視覚的』ですが、解決策は『物理的』です。この不一致はディレクターに指摘されます。" });
                 s -= 40;
-            } else if (hasSubV && hasSolV) {
-                audit.push({ cat: "整合性", p: 5, msg: "目的と手段が『視認性』で一致しており、非常に一貫性があります。" });
-                s += 5;
             }
-
-            if (d.sol.match(/交換|導入|購入|設置/) && d.cost <= 0) {
-                audit.push({ cat: "財務的妥当性", p: -15, msg: "『交換・導入』を行う場合、部品代が0円である根拠が不明確です。実費または準備工数を計上してください。" });
-                s -= 15;
-            }
-
-            if (d.b >= 10 && d.prob.match(/3|4|5|五/) && !d.prob.match(/10|十/)) {
-                audit.push({ cat: "データ精度", p: -10, msg: "現状説明の秒数（3〜5秒）と、入力された秒数（${d.b}秒）に開きがあります。付随動作を含めた内訳が必要です。" });
+            if (d.sol.match(/交換|導入/) && d.cost <= 0) {
+                audit.push({ cat: "財務", p: -10, msg: "交換・導入には通常コストがかかります。0円の根拠が必要です。" });
                 s -= 10;
             }
 
             const clean = (str) => str.trim().replace(/。+$/, '');
-
             const txt = `１，タイトル：${d.measure}による${d.target}の${d.result}
 
 ２，現状：
-${clean(d.prob)}という状況が発生している。
+${clean(d.prob)}
 
 ３．問題：
-あるべき姿（スムーズな遂行）と現状とのギャップにより、1回あたり ${d.b}${diffUnit} の時間がかかっていることが問題である。
+あるべき姿に対し、指先で探す等のロスにより1回あたり ${d.b}${diffUnit} 要している。
 
 ４、問題の真因：
-なぜ？：現状を放置せざるを得ない物理的・手順的な障壁が存在するため。
-真因：4MのMethod（方法）における、最適なワークフロー設定の不足。
+Method（手法）における、経年劣化や環境変化をカバーする物理的ガードの欠如。
 
-５，Working Backwards（喜びの声）：
-「このカイゼンにより、作業効率が上がり、ルーチン作業がとても楽になりました！」
+５，Working Backwards：
+「この改善により道具との無駄な格闘が消え、高品質な作業を維持できるようになりました。」
 
-６，対策（実施内容）：
-${clean(d.sol)}を実施。
+６，実施内容：
+${clean(d.sol)}
 
-７、効果測定（計算式）：
-1. 削減時間の算出：${d.b}${diffUnit} - ${d.a}${diffUnit} = ${diff.toFixed(2)}${diffUnit}/回
-2. 時間換算：${diff.toFixed(2)}${diffUnit} ÷ ${d.unit === 'min' ? '60' : '3600'} = ${hoursPerTime.toFixed(4)}時間/回
-3. 削減金額：${hoursPerTime.toFixed(4)}時間/回 × 1,500円 = ${Math.round(yenPerTime)}円/回
-4. 年間換算：${Math.round(yenPerTime)}円/回 × ${d.f}回/日 × 365日 = ${yenPerYear.toLocaleString()}円/年
+７、効果測定：
+1. ${d.b}${diffUnit} - ${d.a}${diffUnit} = ${diff.toFixed(2)}${diffUnit}/回
+2. ${diff.toFixed(2)}${diffUnit} ÷ ${d.unit === 'sec' ? '3600' : '60'} = ${hoursPerTime.toFixed(4)}時間/回
+3. ${hoursPerTime.toFixed(4)}時間 × 1,500円 = ${Math.round(yenPerTime)}円/回
+4. ${Math.round(yenPerTime)}円 × ${d.f}回 × 365日 = ${yenPerYear.toLocaleString()}円
 
-（無形効果：安全性および作業環境の5S向上に寄与）
+８，1年間削減額 (A)：${yenPerYear.toLocaleString()}円
+９，効果開始 (B)：WK${d.wk}
+10, 本年削減額 (C)：${Math.round(yenPerYear / 52 * (53 - d.wk)).toLocaleString()}円
+11, カイゼン費用 (D)：${d.cost.toLocaleString()}円
+12, 本年実削減額 (E)：${Math.round(yenPerYear / 52 * (53 - d.wk) - d.cost).toLocaleString()}円`;
 
-８，1年間で削減できる金額 (A)：${yenPerYear.toLocaleString()}円
-９，カイゼンの効果開始週 (B)：WK${d.wk}
-10, 本年削減金額 (C)：${Math.round(yenPerYear / 52 * (53 - d.wk)).toLocaleString()}円
-１１，カイゼン費用 (D)：${d.cost.toLocaleString()}円
-１２，本年実削減金額 (E)：${Math.round(yenPerYear / 52 * (53 - d.wk) - d.cost).toLocaleString()}円`;
-
-            return { txt, s, audit, isMismatch };
+            return { txt, s, audit };
         }
 
-        document.getElementById('cp-btn').onclick = () => {
+        function copyReport() {
             navigator.clipboard.writeText(document.getElementById('rep-out').textContent);
-            alert('コピーしました。');
-        };
+            alert('レポートをコピーしました。');
+        }
     </script>
 </body>
 
