@@ -310,16 +310,47 @@
                 <button class="btn-supreme" onclick="nextStep(2)">次へ進む</button>
             </div>
 
-            <!-- STEP 2: Analysis -->
+            <!-- STEP 2: Analysis & Deep Dive -->
             <div class="glass-card hidden fade-in" id="step-2">
-                <p style="margin-bottom: 1.5rem; font-weight: 700;">Step 2: 現状と対策の深掘り</p>
+                <p style="margin-bottom: 1.5rem; font-weight: 700;">Step 2: 現状・問題・なぜなぜ分析</p>
                 <div class="field-group">
-                    <label>現状（問題の描写）</label>
-                    <textarea id="prob" rows="4" placeholder="誰が見ても困っている状況が伝わるように..." required></textarea>
+                    <label>２，現状（背景・目に見えている状況）</label>
+                    <textarea id="prob-bg" rows="3" placeholder="（例）よく使う備品の在庫が作業スペースから離れた所にある。" required></textarea>
                 </div>
                 <div class="field-group">
-                    <label>実施内容（具体的な5W1H）</label>
-                    <textarea id="sol" rows="4" placeholder="いつ、どこに、何を、どう設置したか..." required></textarea>
+                    <label>３．問題（何が、どう問題か）</label>
+                    <textarea id="prob-main" rows="3" placeholder="（例）備品が離れた所にあり、取りに行くのに3分/回ｘ10回＝30分/日かかっている。"
+                        required></textarea>
+                </div>
+                <div class="field-group">
+                    <label>４Ｍカテゴリー</label>
+                    <select id="four-m">
+                        <option value="Method">Method (作業方法・手順)</option>
+                        <option value="Machine">Machine (設備・治具・システム)</option>
+                        <option value="Material">Material (材料・梱包材・備品)</option>
+                        <option value="Man">Man (人・トレーニング・配置)</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>６，実施した対策（具体的な5W1H）</label>
+                    <textarea id="sol" rows="3" placeholder="（例）各梱包デスクにホルダーを設置しシルエット影を貼付。" required></textarea>
+                </div>
+                <div class="field-group">
+                    <label>４、真因究明 (5 Whys)</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="text" id="why1" placeholder="なぜ？ (1回目)">
+                        <input type="text" id="why2" placeholder="なぜ？ (2回目)">
+                        <input type="text" id="why3" placeholder="なぜ？ (3回目)">
+                        <input type="text" id="why4" placeholder="なぜ？ (4回目)">
+                        <input type="text" id="why5" placeholder="なぜ？ (5回目：真因)">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>５，Working Backwards (未来のお客様の声)</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="text" id="wb-customer" placeholder="お客様は誰？ (例：ワーカー、同僚、出荷担当)">
+                        <textarea id="wb-voice" rows="3" placeholder="カイゼン後、どんな風に言ってもらえたら嬉しいか？ (口調を意識)"></textarea>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-supreme btn-secondary" onclick="nextStep(1)">戻る</button>
@@ -421,8 +452,19 @@
                 measure: document.getElementById('measure').value,
                 target: document.getElementById('target').value,
                 result: document.getElementById('result').value,
-                prob: document.getElementById('prob').value,
+                probBg: document.getElementById('prob-bg').value,
+                probMain: document.getElementById('prob-main').value,
                 sol: document.getElementById('sol').value,
+                whys: [
+                    document.getElementById('why1').value,
+                    document.getElementById('why2').value,
+                    document.getElementById('why3').value,
+                    document.getElementById('why4').value,
+                    document.getElementById('why5').value
+                ].filter(w => w.trim() !== ''),
+                wbCustomer: document.getElementById('wb-customer').value,
+                wbVoice: document.getElementById('wb-voice').value,
+                fourM: document.getElementById('four-m').value,
                 b: parseFloat(document.getElementById('b-val').value),
                 a: parseFloat(document.getElementById('a-val').value),
                 f: parseInt(document.getElementById('f-val').value),
@@ -456,51 +498,75 @@
             const audit = [];
             let s = 95;
 
-            // ROI Logic (Official FC 4-Step)
+            // ROI Logic (Official FC 4-Step with Intermediate Rounding)
             const diff = d.b - d.a;
             const diffUnit = d.unit === 'sec' ? '秒' : '分';
             const hoursPerTime = d.unit === 'sec' ? diff / 3600 : diff / 60;
-            const yenPerTime = hoursPerTime * d.rate;
+            const yenPerTimeRaw = hoursPerTime * d.rate;
+            const yenPerTime = Math.round(yenPerTimeRaw);
             const yenPerYear = Math.round(yenPerTime * d.f * 365);
 
-            // Audit Logic (Ron-logic)
-            const subK = ['視認', '見える', '表示', 'カラー', 'ライト', '目印'];
-            const solK = ['剥がす', 'くっつく', 'フラップ', '返し', '物理', '清掃'];
-            const hasSubV = subK.some(k => d.measure.includes(k) || d.target.includes(k));
-            const hasSolP = solK.some(k => d.sol.includes(k));
+            // --- Official Amazon FC Audit (4 points based on manual) ---
 
-            if (hasSubV && hasSolP) {
-                audit.push({ cat: "整合性", p: -40, msg: "タイトルは『視覚的』ですが、解決策は『物理的』です。この不一致はディレクターに指摘されます。" });
-                s -= 40;
+            // 1. カイゼンの機会 (Point #1)
+            if (d.measure.length < 5) {
+                audit.push({ cat: "企画力", p: -5, msg: "タイトルが簡潔すぎます。自発的な工夫が伝わる具体的な名称にしてください。" });
+                s -= 5;
             }
-            if (d.sol.match(/交換|導入/) && d.cost <= 0) {
-                audit.push({ cat: "財務", p: -10, msg: "交換・導入には通常コストがかかります。0円の根拠が必要です。" });
+
+            // 2. 真因の特定 & 3. 再発防止 (Point #2, 3)
+            if (d.whys.length < 3) {
+                audit.push({ cat: "分析力", p: -20, msg: "なぜなぜ分析が3段階未満です。再発防止（Point #2,3）が不十分と判断されます。" });
+                s -= 20;
+            } else if (d.whys.length >= 5) {
+                audit.push({ cat: "分析力", p: 5, msg: "5段階の深掘りがなされており、真因特定への強い意志を感じます。" });
+                s += 5;
+            }
+
+            // 4. 伝わりやすさ (Point #4)
+            const jargonLabel = ['治具', 'タクト', 'リードタイム', '歩留まり', '4M', 'ASIN', 'PO'];
+            const foundJargon = jargonLabel.filter(j => d.probMain.includes(j) || d.sol.includes(j));
+            if (foundJargon.length > 0) {
+                audit.push({ cat: "伝達力", p: -5, msg: "専門用語（" + foundJargon.join(', ') + "）があります。他部署も理解できる表現か確認してください。" });
+                s -= 5;
+            }
+
+            // Working Backwards Culture Check
+            if (!d.wbVoice.includes('」') && !d.wbVoice.includes('「')) {
+                audit.push({ cat: "WB文化", p: -10, msg: "お客様の具体的な「お慶びの声（セリフ）」が不足しています。口調を意識して描写してください。" });
                 s -= 10;
             }
 
             const clean = (str) => str.trim().replace(/。+$/, '');
+
+            // Construct Root Cause Chain (Section 4)
+            const whyChain = d.whys.map((w, i) => `${i + 1}. ${w}`).join('\nなぜ？\n') +
+                (d.whys.length > 0 ? '\n真因：' + d.whys[d.whys.length - 1] : '');
+
             const txt = `１，タイトル：${d.measure}による${d.target}の${d.result}
 
 ２，現状：
-${clean(d.prob)}
+${clean(d.probBg)}
 
 ３．問題：
-あるべき姿に対し、指先で探す等のロスにより1回あたり ${d.b}${diffUnit} 要している。
+${clean(d.probMain)}
 
 ４、問題の真因：
-Method（手法）における、経年劣化や環境変化をカバーする物理的ガードの欠如。
+４Ｍカテゴリー：${d.fourM}
+${whyChain}
 
-５，Working Backwards：
-「この改善により道具との無駄な格闘が消え、高品質な作業を維持できるようになりました。」
+５，ワーキングバックワーズ：
+${d.wbCustomer}の声：
+「${clean(d.wbVoice.replace(/[「」]/g, ''))}」
 
-６，実施内容：
+６，実施した対策：
 ${clean(d.sol)}
 
 ７、効果測定：
 1. ${d.b}${diffUnit} - ${d.a}${diffUnit} = ${diff.toFixed(2)}${diffUnit}/回
 2. ${diff.toFixed(2)}${diffUnit} ÷ ${d.unit === 'sec' ? '3600' : '60'} = ${hoursPerTime.toFixed(4)}時間/回
-3. ${hoursPerTime.toFixed(4)}時間 × 1,500円 = ${Math.round(yenPerTime)}円/回
-4. ${Math.round(yenPerTime)}円 × ${d.f}回 × 365日 = ${yenPerYear.toLocaleString()}円
+3. ${hoursPerTime.toFixed(4)}時間 × 1,500円 = ${yenPerTime}円/回 (端数四捨五入)
+4. ${yenPerTime}円 × ${d.f}回 × 365日 = ${yenPerYear.toLocaleString()}円
 
 ８，1年間削減額 (A)：${yenPerYear.toLocaleString()}円
 ９，効果開始 (B)：WK${d.wk}
